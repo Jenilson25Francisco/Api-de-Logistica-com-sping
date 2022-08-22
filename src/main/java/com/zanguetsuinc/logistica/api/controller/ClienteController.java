@@ -17,6 +17,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.zanguetsuinc.logistica.api.assembler.ClienteAssembler;
+import com.zanguetsuinc.logistica.api.model.ClienteModel;
+import com.zanguetsuinc.logistica.api.model.input.ClienteInput;
 import com.zanguetsuinc.logistica.domain.model.Cliente;
 import com.zanguetsuinc.logistica.domain.repository.ClienteRepository;
 import com.zanguetsuinc.logistica.domain.service.CatalogoClienteService;
@@ -32,28 +35,32 @@ public class ClienteController {
 	
 	private ClienteRepository clienteRepository;
 	private CatalogoClienteService catalogoClienteService;
+	private ClienteAssembler clienteAssembler;
 	
 	@GetMapping
-	public List<Cliente> listar() {
+	public List<ClienteModel> listar() {
 		
-		return clienteRepository.findAll();
+		return clienteAssembler.toCollectionModel(clienteRepository.findAll());
 		
 	}
 	
 	@GetMapping("/{clienteId}")
-	public ResponseEntity<Cliente> buscar(@PathVariable Long clienteId){
+	public ResponseEntity<ClienteModel> buscar(@PathVariable Long clienteId){
 		
 		return clienteRepository.findById(clienteId)
-				.map(ResponseEntity::ok)
+				.map(cliente -> ResponseEntity.ok(clienteAssembler.toModel(cliente)))
 				.orElse(ResponseEntity.notFound().build());
 		
 	}
 	
 	@PostMapping
 	@ResponseStatus(HttpStatus.CREATED)
-	public Cliente adicionar(@Valid @RequestBody Cliente cliente) {
+	public ClienteModel adicionar(@Valid @RequestBody ClienteInput clienteInput) {
 		
-		return catalogoClienteService.salvar(cliente);
+		Cliente novoCliente = clienteAssembler.toEntity(clienteInput);
+		Cliente guardarCliente = catalogoClienteService.salvar(novoCliente);
+		
+		return clienteAssembler.toModel(guardarCliente);
 		
 	}
 	
