@@ -8,7 +8,7 @@ import lombok.Setter;
 public class ClienteModel {
 	
 	private Long id;
-	private String nomeDoCliente;
+	private String nome;
 	private String email;
 	private String telefone;
 

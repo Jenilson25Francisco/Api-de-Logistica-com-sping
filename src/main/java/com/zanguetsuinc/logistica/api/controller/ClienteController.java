@@ -65,6 +65,21 @@ public class ClienteController {
 	}
 	
 	@PutMapping("/{clienteId}")
+	public ResponseEntity<ClienteModel> atualizar(@PathVariable Long clienteId, @Valid @RequestBody ClienteInput clienteInput){
+		
+		if(!clienteRepository.existsById(clienteId)) {
+			return ResponseEntity.notFound().build();
+		}
+		
+		Cliente atualizandoCliente = clienteAssembler.toEntity(clienteInput);
+		atualizandoCliente.setId(clienteId);
+		Cliente clienteAtualizado = catalogoClienteService.salvar(atualizandoCliente);
+		
+		return ResponseEntity.ok(clienteAssembler.toModel(clienteAtualizado));
+		
+	}
+	
+	/*@PutMapping("/{clienteId}")
 	public ResponseEntity<Cliente> atualizar(@PathVariable Long clienteId, @Valid @RequestBody Cliente cliente){
 		
 		if(!clienteRepository.existsById(clienteId)) {
@@ -76,7 +91,7 @@ public class ClienteController {
 		
 		return ResponseEntity.ok(cliente);
 		
-	}
+	}*/
 	
 	@DeleteMapping("/{clienteId}")
 	public ResponseEntity<Void> remover(@PathVariable Long clienteId){

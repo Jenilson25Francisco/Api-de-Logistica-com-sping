@@ -11,6 +11,7 @@ import lombok.Setter;
 @Setter
 public class ClienteInput {
 
+	//private Long id;
 	@NotBlank
 	@Size(max = 60)
 	private String nome;
